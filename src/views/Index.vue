@@ -106,6 +106,14 @@ export default {
       return Math.ceil(this.ticketsFiltered.length / 6)
     }
   },
+  watch: {
+    ws: {
+      handler() {
+        console.log('state', this.ws.readyState)
+      },
+      deep: true
+    }
+  },
   mounted() {
     this.initSocket();
   },
@@ -158,8 +166,8 @@ export default {
           const ticketIdx = this.tickets.findIndex((item) => item.name === ticket)
           if (price) {
             this.tickets[ticketIdx].price = price
-            if (this.selectedTicket.name === ticket) {
-              this.selectedTicket.prices.push(price)
+            if (this.selectedTicketName === ticket) {
+              this.selectedTicketPrices.push(price)
             }
           }
         }
