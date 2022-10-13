@@ -42,13 +42,13 @@
         <ticket
           v-if="(idx+1) <= (6*currentPage) && (idx+1) >= (((currentPage*6)-6)+1)"
           :ticket="ticket"
-          @click="setSelectedTicket(ticket.name, [ticket.price])"
+          @setSelected="setSelectedTicket($event)"
           @removeTicket="removeTicket($event)"
         ></ticket>
       </template>
     </div>
     <Chart
-      v-if="selectedTicket.prices.length"
+      v-if="selectedTicketName"
       :data="chartData"
     ></Chart>
     <Pagination
@@ -61,7 +61,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import Ticket from "../components/Ticket.vue";
 import Chart from "../components/Chart.vue"
 import ApiService from "../services/api.service";
@@ -78,10 +77,8 @@ export default {
       ticket: '',
       tickets: [],
       searchQuery: '',
-      selectedTicket: {
-        name: ref(''),
-        prices: []
-      },
+      selectedTicketName: '',
+      selectedTicketPrices: [],
       ws: null,
       currentPage: 1
     }
@@ -91,7 +88,7 @@ export default {
       return this.tickets.filter((item) => item.name.toUpperCase().includes(this.searchQuery.toUpperCase()))
     },
     chartData() {
-      const prices = this.selectedTicket.prices;
+      const prices = this.selectedTicketPrices;
       let max = 0;
       prices.forEach((item) => {
         if (item > max) {
@@ -114,6 +111,12 @@ export default {
       if (n) {
         this.setSocketEvents();
       }
+    }
+  },
+  created() {
+    this.selectedTicket = {
+      name: '',
+      prices: []
     }
   },
   mounted() {
@@ -142,18 +145,19 @@ export default {
         })
     },
     removeTicket(ticketName) {
+      console.log('remove', ticketName)
       const ticketIdx = this.tickets.findIndex((item) => item.name === ticketName)
-      if (ticketName === this.selectedTicket.name) {
-        this.setSelectedTicket('', [])
+      if (ticketName === this.selectedTicketName) {
+        this.setSelectedTicket({name: '', price: ''})
       }
       this.tickets.splice(ticketIdx, 1)
       this.removeSubscription(ticketName)
     },
-    setSelectedTicket(name, prices) {
-      this.selectedTicket = {
-        name,
-        prices
-      }
+    setSelectedTicket(ticket) {
+      console.log('set')
+      this.selectedTicketName = ticket.name;
+      this.selectedTicketPrices = [ticket.price];
+      console.log(this.selectedTicketName, this.selectedTicketPrices)
     },
     initSocket() {
       this.ws = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=3fd910df59aec1532f0d628006650038c746f4a62731a5cf04c3d59f7a31296a")

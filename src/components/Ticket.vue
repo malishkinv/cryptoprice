@@ -1,12 +1,18 @@
 <template>
   <div class="ticket rounded bg-white p-4 w-full border border-gray-300 cursor-pointer mb-3 md:mb-0">
     <div class="flex justify-between mb-1">
-      <div class="ticket__name text-sm text-gray-900">{{ ticket.name }}</div>
-      <div class="ticket__remove" @click="removeTicket">
+      <div
+        class="ticket__name text-sm text-gray-900"
+        @click="setSelectedTicket(ticket)"
+      >{{ ticket.name }}</div>
+      <div class="ticket__remove" @click.prevent="removeTicket">
         <icon-trash class="w-4 h-4 cursor-pointer"></icon-trash>
       </div>
     </div>
-    <div class="ticket__value text-4xl text-gray-900">{{ticket.price }}$</div>
+    <div
+      class="ticket__value text-4xl text-gray-900"
+      @click="setSelectedTicket(ticket)"
+    >{{ticket.price }}$</div>
   </div>
 </template>
 
@@ -20,6 +26,9 @@ export default {
     ticket: { type: Object }
   },
   methods: {
+    setSelectedTicket(ticket) {
+      this.$emit('setSelected', ticket)
+    },
     removeTicket() {
       this.$emit('removeTicket', this.ticket.name)
     }
