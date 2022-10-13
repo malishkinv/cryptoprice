@@ -42,13 +42,13 @@
         <ticket
           v-if="(idx+1) <= (6*currentPage) && (idx+1) >= (((currentPage*6)-6)+1)"
           :ticket="ticket"
-          @click="setSelectedTicket(ticket.name)"
+          @click="setSelectedTicket(ticket.name, [ticket.price])"
           @removeTicket="removeTicket($event)"
         ></ticket>
       </template>
     </div>
     <Chart
-      v-if="selectedTicket.name"
+      v-if="selectedTicket.prices.length"
       :data="chartData"
     ></Chart>
     <Pagination
@@ -79,7 +79,7 @@ export default {
       tickets: [],
       searchQuery: '',
       selectedTicket: {
-        name: '',
+        name: ref(''),
         prices: []
       },
       ws: null,
@@ -143,20 +143,16 @@ export default {
     },
     removeTicket(ticketName) {
       const ticketIdx = this.tickets.findIndex((item) => item.name === ticketName)
-      if (ticketName === this.selectedTicket) {
-        this.selectedTicket = {
-          name: ref(''),
-          prices: ref([])
-        }
+      if (ticketName === this.selectedTicket.name) {
+        this.setSelectedTicket('', [])
       }
       this.tickets.splice(ticketIdx, 1)
       this.removeSubscription(ticketName)
     },
-    setSelectedTicket(ticketName) {
-      console.log(ticketName)
+    setSelectedTicket(name, prices) {
       this.selectedTicket = {
-        name: ticketName,
-        prices: []
+        name,
+        prices
       }
     },
     initSocket() {
@@ -212,7 +208,7 @@ export default {
       this.ws = null
       setTimeout(() => {
         this.initSocket()
-      }, 5000)
+      }, 10000)
     },
     setCurrentPage(page) {
       this.currentPage = page
