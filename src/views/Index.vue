@@ -106,13 +106,6 @@ export default {
       return Math.ceil(this.ticketsFiltered.length / 6)
     }
   },
-  watch: {
-    ws(n) {
-      if (n) {
-        this.setSocketEvents();
-      }
-    }
-  },
   created() {
     this.selectedTicket = {
       name: '',
@@ -161,6 +154,7 @@ export default {
     },
     initSocket() {
       this.ws = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=3fd910df59aec1532f0d628006650038c746f4a62731a5cf04c3d59f7a31296a")
+      this.setSocketEvents()
     },
     setSocketEvents() {
       this.ws.onmessage = (e) => {
@@ -212,7 +206,7 @@ export default {
       this.ws = null
       setTimeout(() => {
         this.initSocket()
-      }, 10000)
+      }, 5000)
     },
     setCurrentPage(page) {
       this.currentPage = page
