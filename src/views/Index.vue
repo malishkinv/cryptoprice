@@ -106,18 +106,8 @@ export default {
       return Math.ceil(this.ticketsFiltered.length / 6)
     }
   },
-  created() {
-    this.selectedTicket = {
-      name: '',
-      prices: []
-    }
-  },
   mounted() {
     this.initSocket();
-    window.addEventListener("unload", function () {
-      if(this.ws && this.ws.readyState === WebSocket.OPEN)
-        this.closeSocket()
-    });
   },
   methods: {
     addTicket() {
@@ -153,8 +143,10 @@ export default {
       console.log(this.selectedTicketName, this.selectedTicketPrices)
     },
     initSocket() {
-      this.ws = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=3fd910df59aec1532f0d628006650038c746f4a62731a5cf04c3d59f7a31296a")
-      this.setSocketEvents()
+      if (!this.ws) {
+        this.ws = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=3fd910df59aec1532f0d628006650038c746f4a62731a5cf04c3d59f7a31296a")
+        this.setSocketEvents()
+      }
     },
     setSocketEvents() {
       this.ws.onmessage = (e) => {
@@ -173,7 +165,7 @@ export default {
         }
         if (responseType === '429') {
           console.log(response)
-          this.closeSocket()
+          // this.closeSocket()
         }
       }
       this.ws.onopen = () => {
@@ -203,7 +195,10 @@ export default {
       }
     },
     closeSocket() {
-      this.ws = null
+      if (this.ws) {
+        this.ws.close()
+        this.ws = null
+      }
       setTimeout(() => {
         this.initSocket()
       }, 5000)
