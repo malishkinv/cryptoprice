@@ -8,7 +8,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "esbuild-darwin-arm64": "^0.15.10",
     "nvm": "0.0.4",
     "vue": "^3.2.38",
     "vue-router": "^4.1.5"
